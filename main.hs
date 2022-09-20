@@ -1,137 +1,113 @@
 module Main where
-import Data.List (group, intercalate)
 
--- Problem 01
+import Control.Arrow
+
+-- Problem 1. Tail of a list
+-- >>> myLast ["a", "b", "c", "d"]
+-- Just "d"
+-- >>> myLast []
+-- Nothing
 myLast :: [a] -> Maybe a
 myLast [] = Nothing
 myLast [x] = Just x
 myLast (_:xs) = myLast xs
 
--- Problem 02
-myTwoLast :: [a] -> Maybe (a, a)
-myTwoLast [] = Nothing
-myTwoLast [_] = Nothing
-myTwoLast [x, y] = Just (x, y)
-myTwoLast (_:xs) = myTwoLast xs
+-- Problem 2. Last two elements of a list
+-- >>> myLastTwo ["a", "b", "c", "d"]
+-- Just ("c", "d")
+-- >>> myLastTwo ["a"]
+-- Nothing
+myLastTwo :: [a] -> Maybe (a, a)
+myLastTwo [] = Nothing
+myLastTwo [_] = Nothing
+myLastTwo [x, y] = Just (x, y)
+myLastTwo (_:xs) = myLastTwo xs
 
--- Problem 03
-myAt :: Int -> [a] -> Maybe a
-myAt _ [] = Nothing
-myAt 0 (x:xs) = Just x
-myAt n (x:xs) = myAt (n - 1) xs
+-- Problem 3. Kth element of a list
+-- >>> myElementAt ["a", "b", "c", "d"] 2
+-- >>> myElementAt ["a", "b", "c", "d"] 5
+-- Just "c"
+-- Nothing
+myElementAt :: [a] -> Int -> Maybe a
+myElementAt [] _ = Nothing
+myElementAt (x:_) 0 = Just x
+myElementAt (_:xs) n = myElementAt xs (n - 1)
 
--- Problem 04
+-- Problem 4. Number of elements in a list
+-- >>> myLength ["a", "b", "c", "d"]
+-- 4
 myLength :: [a] -> Int
-myLength = foldr (const (+1)) 0
+myLength = myLengthTR 0
+    where
+        myLengthTR acc [] = acc
+        myLengthTR acc (_:xs) = myLengthTR (acc + 1) xs
 
--- Problem 05
+-- Problem 5. Reverse a list
+-- >>> myReverse ["a", "b", "c", "d"]
+-- ["d","c","b","a"]
 myReverse :: [a] -> [a]
-myReverse [] = []
-myReverse (x:xs) = myReverse xs ++ [x]
+myReverse = myReverseTR []
+    where
+        myReverseTR acc [] = acc
+        myReverseTR acc (x:xs) = myReverseTR (x:acc) xs
 
--- Problem 06
-myPalindrome :: Eq a => [a] -> Bool
-myPalindrome xs = xs == myReverse xs
+-- Problem 6. Find out whether a list is a palindrome
+-- >>> myIsPalindrome [1,2,3]
+-- False
+-- >>> myIsPalindrome ["x","a","m","a","x"]
+-- True
+myIsPalindrome :: Eq a => [a] -> Bool
+myIsPalindrome xs = xs == myReverse xs
 
--- Problem 07
-myFlatten :: [[a]] -> [a]
-myFlatten = concat
+-- Problem 7. Flatten a nested list structure
+-- >>> myFlatten (One "a")
+-- ["a"]
+-- >>> myFlatten (Many [One "a", Many [One "b", One "c"], One "d"])
+-- ["a","b","c","d"]
+data MyNestedList a = One a | Many [MyNestedList a] 
+myFlatten :: MyNestedList a -> [a]
+myFlatten (One x) = [x]
+myFlatten (Many xs) = concatMap myFlatten xs
 
-myFlatten' :: [[a]] -> [a]
-myFlatten' xs = go [] xs
-    where go acc [] = acc
-          go acc (x:xs) = go (acc++x) xs
-
--- Problem 08
+-- Problem 8. Eliminate consecutive duplicates of list elements
+-- >>> myCompress ["a","a","a","a","b","c","c","a","a","d","e","e","e","e"]
+-- ["a","b","c","a","d","e"]
 myCompress :: Eq a => [a] -> [a]
-myCompress = map head . group
+myCompress = myCompressTR []
+    where
+        myCompressTR acc [] = acc
+        myCompressTR acc (x:xs)
+            | myLast acc == Just x = myCompressTR acc xs
+            | otherwise = myCompressTR (acc ++ [x]) xs
 
-myCompress' :: Eq a => [a] -> [a]
-myCompress' [] = []
-myCompress' [x] = [x]
-myCompress' (x:y:xs)
-    | x == y = myCompress' (y:xs)
-    | otherwise = x : myCompress' (y:xs)
-
--- Problem 09
+-- Problem 9. Pack consecutive duplicates of list elements into sublists
+-- >>> myPack ["a","a","a","a","b","c","c","a","a","d","e","e","e","e"]
+-- [["a","a","a","a"],["b"],["c","c"],["a","a"],["d"],["e","e","e","e"]]
 myPack :: Eq a => [a] -> [[a]]
-myPack = group
+myPack = myPackTR [] []
+    where
+        myPackTR res [] [] = res
+        myPackTR res acc [] = res ++ [acc]
+        myPackTR res [] (x:xs) = myPackTR res [x] xs
+        myPackTR res acc (x:xs)
+            | myLast acc == Just x = myPackTR res (acc ++ [x]) xs
+            | otherwise = myPackTR (res ++ [acc]) [x] xs
 
-myPack' :: Eq a => [a] -> [[a]]
-myPack' = myReverse . go [] []
-    where go _ _ [] = []
-          go curr acc [x] = (x : curr) : acc
-          go curr acc (x:xs@(y:_))
-            | x == y = go (x : curr) acc xs
-            | otherwise = go [] ((x : curr) : acc) xs
-
--- Problem 10
+-- Problem 10. Run length encoding of a list
+-- >>> myEncode ["a","a","a","a","b","c","c","a","a","d","e","e","e","e"]
+-- [(4,"a"),(1,"b"),(2,"c"),(2,"a"),(1,"d"),(4,"e")]
 myEncode :: Eq a => [a] -> [(Int, a)]
-myEncode xs = zip (map length gs) (map head gs)
-    where gs = group xs
+myEncode = map (myLength &&& head) . myPack
 
-myEncode' :: Eq a => [a] -> [(Int, a)]
-myEncode' xs = zipWith f gs gs
-    where gs = group xs
-          f = flip ((,) . length) . head
-
--- Problem 11
-data RList a = ConsOne a (RList a)
-             | ConsMany (Int, a) (RList a)
-             | REmpty
-
-instance Show a => Show (RList a) where
-    show ys = "[" ++ intercalate "," (go ys) ++ "]"
-        where go REmpty = []
-              go (ConsOne x xs) = show x : go xs
-              go (ConsMany x xs) = show x : go xs
-
-myEncodeR :: Eq a => [a] -> RList a
-myEncodeR = f . group
-    where f [] = REmpty
-          f (x:xs)
-            | length x == 1 = ConsOne (head x) (f xs)
-            | otherwise     = ConsMany (length x, head x) (f xs)
-
--- Problem 12
-myDecodeR :: RList a -> [a]
-myDecodeR REmpty = []
-myDecodeR (ConsOne x xs) = x : myDecodeR xs
-myDecodeR (ConsMany (l, x) xs) = replicate l x ++ myDecodeR xs
-
--- Problem 13
-myEncodeRD :: Eq a => [a] -> RList a
-myEncodeRD = go 1
-    where go _ [] = REmpty
-          go 1 [x] = ConsOne x REmpty
-          go acc [x] = ConsMany (acc, x) REmpty
-          go acc (x:xs@(y:_))
-            | x /= y && acc == 1 = ConsOne x (go 1 xs)
-            | x /= y             = ConsMany (acc, x) (go 1 xs)
-            | otherwise = go (acc+1) xs
-
--- Problem 14
-myDuplicate :: [a] -> [a]
-myDuplicate [] = []
-myDuplicate (x:xs) = x : x : myDuplicate xs
-
--- Problem 15
-myReplicate :: [a] -> Int -> [a]
-myReplicate [] _ = []
-myReplicate (x:xs) n = replicate n x ++ myReplicate xs n
-
--- Problem 16
-myDrop :: [a] -> Int -> [a]
-myDrop = go 1
-    where go _ [] _ = []
-          go acc (x:xs) n
-            | n == acc  = go 1 xs n
-            | otherwise = x : go (acc+1) xs n
-
--- Problem 17
-mySplit :: [a] -> Int -> ([a], [a])
-mySplit xs n = splitAt n xs
+-- Problem 11. Modified run length encoding
+-- >>> myModifiedEncode ["a","a","a","a","b","c","c","a","a","d","e","e","e","e"]
+-- [Multiple 4 "a",Single "b",Multiple 2 "c",Multiple 2 "a",Single "d",Multiple 4 "e"]
+data MyEncoded a = Single a | Multiple Int a deriving (Show)
+myModifiedEncode :: Eq a => [a] -> [MyEncoded a]
+myModifiedEncode = map f . myEncode
+    where
+        f (1, x) = Single x
+        f (n, x) = Multiple n x
 
 main :: IO ()
 main = undefined
-

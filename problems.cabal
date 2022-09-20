@@ -1,0 +1,9 @@
+cabal-version: >=1.8
+name: problems
+version: 1
+build-type: Simple
+
+executable main
+  main-is: main.hs
+  build-depends: base
+  ghc-options: -Wall
