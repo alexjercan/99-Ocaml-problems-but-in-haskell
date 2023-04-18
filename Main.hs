@@ -191,5 +191,12 @@ myRotate xs n = (myDrop n xs) ++ (myTake n xs)
         myDrop m (_:ys) = myDrop (m-1) ys
 
 
+-- Problem 20. Remove the K'th Element From a List
+-- >>> removeAt 1 ["a", "b", "c", "d"]
+-- ["a","c","d"]
+--
+removeAt :: Int -> [a] -> [a]
+removeAt k xs = take k xs ++ drop (k+1) xs
+
 main :: IO ()
 main = print "Hello, World!"
