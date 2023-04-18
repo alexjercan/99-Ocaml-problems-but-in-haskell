@@ -5,5 +5,5 @@ build-type: Simple
 
 executable main
   main-is: Main.hs
-  build-depends: base
+  build-depends: base, random==1.2.1.1
   ghc-options: -Wall

@@ -1,6 +1,8 @@
 module Main where
 
 import Control.Arrow ( Arrow((&&&)) )
+import System.Random
+import Data.List (unfoldr)
 
 -- Problem 1. Tail of a list
 -- >>> myLast ["a", "b", "c", "d"]
@@ -220,6 +222,21 @@ myRange s e
             | y <= z = zs
             | otherwise = f x y (z+1) (zs++[z])
 
+
+-- Problem 23. Extract a Given Number of Randomly Selected Elements From a List
+-- >>> myRandomSelect 69 ["a", "b", "c", "d", "e", "f", "g", "h"] 3
+-- ["f","g","a"]
+myRandomSelect :: Int -> [a] -> Int -> [a]
+myRandomSelect seed xs n =  chain choice n (xs, pureGen)
+    where
+        pureGen = mkStdGen seed
+        choice (ys, g) =
+            let (i, g') = uniformR (0, length ys - 1) g
+            in (ys !! i, (removeAt i ys, g'))
+        chain _ 0 _ = []
+        chain f k s =
+            let (a, s') = f s
+            in (a : (chain f (k-1) s'))
 
 main :: IO ()
 main = print "Hello, World!"
