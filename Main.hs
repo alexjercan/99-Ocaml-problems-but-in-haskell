@@ -133,5 +133,27 @@ myModifiedEncodeDirect = reverse . foldl f []
             | x == y = (Multiple (n+1) x):xs
             | otherwise = (Single y):xs'
 
+-- Problem 14. Duplicate the Elements of a List
+-- >>> myDuplicate ["a", "b", "c", "d"]
+-- ["a","a","b","b","c","c","d","d"]
+myDuplicate :: [a] -> [a]
+myDuplicate = concatMap (\x -> [x, x])
+
+-- Problem 15. Replicate the Elements of a List a Given Number of Times
+-- >>> myNDuplicate ["a", "b", "c"] 3
+-- ["a","a","a","b","b","b","c","c","c"]
+myNDuplicate :: [a] -> Int -> [a]
+myNDuplicate xs n = concatMap (\x -> take n $ replicate n x) xs
+
+-- Problem 16. Drop Every N'th Element From a List
+-- >>> myNthDrop ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j"] 3
+-- ["a","b","d","e","g","h","j"]
+myNthDrop :: [a] -> Int -> [a]
+myNthDrop xs n = reverse $ fst $ foldl f ([], 1) xs
+    where
+        f (ys, acc) x
+            | acc `mod` n == 0 = (ys, acc + 1)
+            | otherwise = (x : ys, acc + 1)
+
 main :: IO ()
-main = undefined
+main = print "Hello, World!"
