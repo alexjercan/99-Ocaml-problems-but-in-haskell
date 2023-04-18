@@ -194,7 +194,6 @@ myRotate xs n = (myDrop n xs) ++ (myTake n xs)
 -- Problem 20. Remove the K'th Element From a List
 -- >>> removeAt 1 ["a", "b", "c", "d"]
 -- ["a","c","d"]
---
 removeAt :: Int -> [a] -> [a]
 removeAt k xs = take k xs ++ drop (k+1) xs
 
