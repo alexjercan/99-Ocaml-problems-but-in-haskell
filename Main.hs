@@ -155,5 +155,17 @@ myNthDrop xs n = reverse $ fst $ foldl f ([], 1) xs
             | acc `mod` n == 0 = (ys, acc + 1)
             | otherwise = (x : ys, acc + 1)
 
+-- Problem 17. Split a List Into Two Parts; The Length of the First Part Is Given
+-- >>> mySplitParts ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j"] 3
+-- (["a","b","c"],["d","e","f","g","h","i","j"])
+-- >>> mySplitParts ["a", "b", "c", "d"] 5
+-- (["a","b","c","d"],[])
+mySplitParts :: [a] -> Int -> ([a], [a])
+mySplitParts xs n = fst $ foldl f (([], []), 0) xs
+    where
+        f ((ls, rs), acc) x
+            | acc < n = ((ls ++ [x], rs), acc + 1)
+            | otherwise = ((ls, rs ++ [x]), acc + 1)
+
 main :: IO ()
 main = print "Hello, World!"
