@@ -167,5 +167,12 @@ mySplitParts xs n = fst $ foldl f (([], []), 0) xs
             | acc < n = ((ls ++ [x], rs), acc + 1)
             | otherwise = ((ls, rs ++ [x]), acc + 1)
 
+-- Problem 18. Extract a Slice From a List
+-- >>> mySlice ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j"] 2 6
+-- ["c","d","e","f","g"]
+--
+mySlice :: [a] -> Int -> Int -> [a]
+mySlice xs s e = snd $ mySplitParts (fst $ mySplitParts xs (e + 1)) s
+
 main :: IO ()
 main = print "Hello, World!"
