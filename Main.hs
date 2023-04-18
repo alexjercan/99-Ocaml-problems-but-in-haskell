@@ -197,5 +197,29 @@ myRotate xs n = (myDrop n xs) ++ (myTake n xs)
 removeAt :: Int -> [a] -> [a]
 removeAt k xs = take k xs ++ drop (k+1) xs
 
+-- Problem 21. Insert an Element at a Given Position Into a List
+-- >>> insertAt "alfa" 1 ["a", "b", "c", "d"]
+-- ["a","alfa","c","d"]
+--
+insertAt :: a -> Int -> [a] -> [a]
+insertAt x k xs = take k xs ++ [x] ++ drop (k+1) xs
+
+-- Problem 22. Create a List Containing All Integers Within a Given Range
+-- >>> myRange 4 9
+-- [4,5,6,7,8]
+--
+-- >>> myRange 9 4
+-- [8,7,6,5,4]
+--
+myRange :: Int -> Int -> [Int]
+myRange s e
+    | s <= e = f s e s []
+    | otherwise = reverse $ f e s e []
+    where
+        f x y z zs
+            | y <= z = zs
+            | otherwise = f x y (z+1) (zs++[z])
+
+
 main :: IO ()
 main = print "Hello, World!"
