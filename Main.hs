@@ -64,7 +64,7 @@ myIsPalindrome xs = xs == myReverse xs
 -- ["a"]
 -- >>> myFlatten (Many [One "a", Many [One "b", One "c"], One "d"])
 -- ["a","b","c","d"]
-data MyNestedList a = One a | Many [MyNestedList a] 
+data MyNestedList a = One a | Many [MyNestedList a]
 myFlatten :: MyNestedList a -> [a]
 myFlatten (One x) = [x]
 myFlatten (Many xs) = concatMap myFlatten xs
