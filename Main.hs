@@ -1,6 +1,6 @@
 module Main where
 
-import Control.Arrow
+import Control.Arrow ( Arrow((&&&)) )
 
 -- Problem 1. Tail of a list
 -- >>> myLast ["a", "b", "c", "d"]
@@ -108,6 +108,30 @@ myModifiedEncode = map f . myEncode
     where
         f (1, x) = Single x
         f (n, x) = Multiple n x
+
+-- Problem 12. Decode a Run-Length Encoded List
+-- >>> myModifiedDecode [Multiple 4 "a",Single "b",Multiple 2 "c",Multiple 2 "a",Single "d",Multiple 4 "e"]
+-- ["a","a","a","a","b","c","c","a","a","d","e","e","e","e"]
+myModifiedDecode :: Eq a => [MyEncoded a] -> [a]
+myModifiedDecode = concatMap f
+    where
+        f (Single x) = [x]
+        f (Multiple n x) = take n $ repeat x
+
+-- Problem 13. Run-Length Encoding of a List (Direct Solution)
+-- >>> myModifiedEncodeDirect ["a","a","a","a","b","c","c","a","a","d","e","e","e","e"]
+-- [Multiple 4 "a",Single "b",Multiple 2 "c",Multiple 2 "a",Single "d",Multiple 4 "e"]
+--
+myModifiedEncodeDirect :: Eq a => [a] -> [MyEncoded a]
+myModifiedEncodeDirect = reverse . foldl f []
+    where
+        f [] y = [Single y]
+        f xs'@((Single x):xs) y
+            | x == y = (Multiple 2 x):xs
+            | otherwise = (Single y):xs'
+        f xs'@((Multiple n x):xs) y
+            | x == y = (Multiple (n+1) x):xs
+            | otherwise = (Single y):xs'
 
 main :: IO ()
 main = undefined
