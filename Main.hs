@@ -174,5 +174,22 @@ mySplitParts xs n = fst $ foldl f (([], []), 0) xs
 mySlice :: [a] -> Int -> Int -> [a]
 mySlice xs s e = snd $ mySplitParts (fst $ mySplitParts xs (e + 1)) s
 
+-- Problem 19. Rotate a List N Places to the Left
+-- >>> myRotate ["a", "b", "c", "d", "e", "f", "g", "h"] 3
+-- ["d","e","f","g","h","a","b","c"]
+--
+myRotate :: [a] -> Int -> [a]
+myRotate xs n = (myDrop n xs) ++ (myTake n xs)
+    where
+        myTake :: Int -> [a] -> [a]
+        myTake 0 _ = []
+        myTake _ [] = []
+        myTake m (y:ys) = y : myTake (m-1) ys
+        myDrop :: Int -> [a] -> [a]
+        myDrop 0 ys = ys
+        myDrop _ [] = []
+        myDrop m (_:ys) = myDrop (m-1) ys
+
+
 main :: IO ()
 main = print "Hello, World!"
