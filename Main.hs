@@ -238,5 +238,17 @@ myRandomSelect seed xs n =  chain choice n (xs, pureGen)
             let (a, s') = f s
             in (a : (chain f (k-1) s'))
 
+-- Problem 24. Lotto: Draw N Different Random Numbers From the Set 1..M
+--  >>> myLottoSelect 69 6 49
+-- [6,7,35,31,22,41]
+myLottoSelect :: Int -> Int -> Int -> [Int]
+myLottoSelect seed n m  = myRandomSelect seed (myRange 1 m) n
+
+-- Problem 25. Generate a Random Permutation of the Elements of a List
+-- >>> myPermutation 69 ["a", "b", "c", "d", "e", "f"]
+-- ["f","a","b","e","c","d"]
+myPermutation :: Int -> [a] -> [a]
+myPermutation seed xs = myRandomSelect seed xs (length xs)
+
 main :: IO ()
 main = print "Hello, World!"
