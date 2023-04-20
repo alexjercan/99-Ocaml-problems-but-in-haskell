@@ -2,7 +2,8 @@ module Main where
 
 import Control.Arrow ( Arrow((&&&)) )
 import System.Random ( uniformR, mkStdGen )
-import Data.List (nub)
+import Data.List (nub, sortBy)
+import Data.Function (on)
 
 -- Problem 1. Tail of a list
 -- >>> myLast ["a", "b", "c", "d"]
@@ -267,6 +268,12 @@ myGroup xs ks = ts
         ys = map (\k -> myExtract k xs) ks
         zs = foldl (\ws y -> concatMap (\y' -> map (\w -> w ++ [y']) ws) y) [[]] ys
         ts = filter (\z -> (length $ nub $ concat z) == (length $ concat z)) zs
+
+-- Problem 28. Sorting a List of Lists According to Length of Sublists
+-- >>> lengthSort [["a", "b", "c"], ["d", "e"], ["f", "g", "h"], ["d", "e"], ["i", "j", "k", "l"], ["m", "n"], ["o"]]
+-- [["o"],["d","e"],["d","e"],["m","n"],["a","b","c"],["f","g","h"],["i","j","k","l"]]
+lengthSort :: Ord a => [[a]] -> [[a]]
+lengthSort xs = sortBy (compare `on` length) xs
 
 main :: IO ()
 main = print "Hello, World!"
