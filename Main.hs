@@ -250,5 +250,13 @@ myLottoSelect seed n m  = myRandomSelect seed (myRange 1 m) n
 myPermutation :: Int -> [a] -> [a]
 myPermutation seed xs = myRandomSelect seed xs (length xs)
 
+-- Problem 26. Generate the Combinations of K Distinct Objects Chosen From the N Elements of a List
+-- >>> myExtract 2 ["a", "b", "c", "d"]
+-- [["a","b"],["a","c"],["a","d"],["b","c"],["b","d"],["c","d"]]
+myExtract :: Int -> [a] -> [[a]]
+myExtract 0 _ = [[]]
+myExtract _ [] = []
+myExtract k (x:xs) = (map ((:) x) (myExtract (k-1) xs)) ++ (myExtract k xs)
+
 main :: IO ()
 main = print "Hello, World!"
