@@ -1,8 +1,8 @@
 module Main where
 
 import Control.Arrow ( Arrow((&&&)) )
-import System.Random
-import Data.List (unfoldr)
+import System.Random ( uniformR, mkStdGen )
+import Data.List (nub)
 
 -- Problem 1. Tail of a list
 -- >>> myLast ["a", "b", "c", "d"]
@@ -257,6 +257,16 @@ myExtract :: Int -> [a] -> [[a]]
 myExtract 0 _ = [[]]
 myExtract _ [] = []
 myExtract k (x:xs) = (map ((:) x) (myExtract (k-1) xs)) ++ (myExtract k xs)
+
+-- Problem 27. Group the Elements of a Set Into Disjoint Subsets
+-- >>> myGroup ["a", "b", "c", "d"] [2, 1]
+-- [[["b","c"],["a"]],[["b","d"],["a"]],[["c","d"],["a"]],[["a","c"],["b"]],[["a","d"],["b"]],[["c","d"],["b"]],[["a","b"],["c"]],[["a","d"],["c"]],[["b","d"],["c"]],[["a","b"],["d"]],[["a","c"],["d"]],[["b","c"],["d"]]]
+myGroup :: Eq a => [a] -> [Int] -> [[[a]]]
+myGroup xs ks = ts
+    where
+        ys = map (\k -> myExtract k xs) ks
+        zs = foldl (\ws y -> concatMap (\y' -> map (\w -> w ++ [y']) ws) y) [[]] ys
+        ts = filter (\z -> (length $ nub $ concat z) == (length $ concat z)) zs
 
 main :: IO ()
 main = print "Hello, World!"
