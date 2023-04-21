@@ -119,7 +119,7 @@ myModifiedDecode :: Eq a => [MyEncoded a] -> [a]
 myModifiedDecode = concatMap f
     where
         f (Single x) = [x]
-        f (Multiple n x) = take n $ repeat x
+        f (Multiple n x) = replicate n x
 
 -- Problem 13. Run-Length Encoding of a List (Direct Solution)
 -- >>> myModifiedEncodeDirect ["a","a","a","a","b","c","c","a","a","d","e","e","e","e"]
@@ -130,11 +130,11 @@ myModifiedEncodeDirect = reverse . foldl f []
     where
         f [] y = [Single y]
         f xs'@((Single x):xs) y
-            | x == y = (Multiple 2 x):xs
-            | otherwise = (Single y):xs'
+            | x == y = Multiple 2 x:xs
+            | otherwise = Single y:xs'
         f xs'@((Multiple n x):xs) y
-            | x == y = (Multiple (n+1) x):xs
-            | otherwise = (Single y):xs'
+            | x == y = Multiple (n+1) x:xs
+            | otherwise = Single y:xs'
 
 -- Problem 14. Duplicate the Elements of a List
 -- >>> myDuplicate ["a", "b", "c", "d"]
@@ -146,7 +146,7 @@ myDuplicate = concatMap (\x -> [x, x])
 -- >>> myNDuplicate ["a", "b", "c"] 3
 -- ["a","a","a","b","b","b","c","c","c"]
 myNDuplicate :: [a] -> Int -> [a]
-myNDuplicate xs n = concatMap (\x -> take n $ replicate n x) xs
+myNDuplicate xs n = concatMap (replicate n) xs
 
 -- Problem 16. Drop Every N'th Element From a List
 -- >>> myNthDrop ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j"] 3
@@ -182,7 +182,7 @@ mySlice xs s e = snd $ mySplitParts (fst $ mySplitParts xs (e + 1)) s
 -- ["d","e","f","g","h","a","b","c"]
 --
 myRotate :: [a] -> Int -> [a]
-myRotate xs n = (myDrop n xs) ++ (myTake n xs)
+myRotate xs n = myDrop n xs ++ myTake n xs
     where
         myTake :: Int -> [a] -> [a]
         myTake 0 _ = []
@@ -237,7 +237,7 @@ myRandomSelect seed xs n =  chain choice n (xs, pureGen)
         chain _ 0 _ = []
         chain f k s =
             let (a, s') = f s
-            in (a : (chain f (k-1) s'))
+            in (a : chain f (k-1) s')
 
 -- Problem 24. Lotto: Draw N Different Random Numbers From the Set 1..M
 --  >>> myLottoSelect 69 6 49
@@ -257,7 +257,7 @@ myPermutation seed xs = myRandomSelect seed xs (length xs)
 myExtract :: Int -> [a] -> [[a]]
 myExtract 0 _ = [[]]
 myExtract _ [] = []
-myExtract k (x:xs) = (map ((:) x) (myExtract (k-1) xs)) ++ (myExtract k xs)
+myExtract k (x:xs) = map (x :) (myExtract (k-1) xs) ++ myExtract k xs
 
 -- Problem 27. Group the Elements of a Set Into Disjoint Subsets
 -- >>> myGroup ["a", "b", "c", "d"] [2, 1]
@@ -265,15 +265,15 @@ myExtract k (x:xs) = (map ((:) x) (myExtract (k-1) xs)) ++ (myExtract k xs)
 myGroup :: Eq a => [a] -> [Int] -> [[[a]]]
 myGroup xs ks = ts
     where
-        ys = map (\k -> myExtract k xs) ks
+        ys = map (`myExtract` xs) ks
         zs = foldl (\ws y -> concatMap (\y' -> map (\w -> w ++ [y']) ws) y) [[]] ys
-        ts = filter (\z -> (length $ nub $ concat z) == (length $ concat z)) zs
+        ts = filter (\z -> length (nub $ concat z) == length (concat z)) zs
 
 -- Problem 28. Sorting a List of Lists According to Length of Sublists
 -- >>> lengthSort [["a", "b", "c"], ["d", "e"], ["f", "g", "h"], ["d", "e"], ["i", "j", "k", "l"], ["m", "n"], ["o"]]
 -- [["o"],["d","e"],["d","e"],["m","n"],["a","b","c"],["f","g","h"],["i","j","k","l"]]
 lengthSort :: Ord a => [[a]] -> [[a]]
-lengthSort xs = sortBy (compare `on` length) xs
+lengthSort = sortBy (compare `on` length)
 
 main :: IO ()
 main = print "Hello, World!"
