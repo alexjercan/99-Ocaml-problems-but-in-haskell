@@ -275,5 +275,18 @@ myGroup xs ks = ts
 lengthSort :: Ord a => [[a]] -> [[a]]
 lengthSort = sortBy (compare `on` length)
 
+-- Problem 29. Determine Whether a Given Integer Number Is Prime
+-- >>> isPrime 1
+-- False
+-- >>> isPrime 7
+-- True
+-- >>> isPrime 12
+-- False
+isPrime :: Int -> Bool
+isPrime 1 = False
+isPrime n = not $ any (\a -> n `mod` a == 0) [2..top]
+    where
+        top = floor $ (sqrt :: Double -> Double) $ fromIntegral n
+
 main :: IO ()
 main = print "Hello, World!"
